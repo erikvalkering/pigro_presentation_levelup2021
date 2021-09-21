@@ -2,6 +2,7 @@
   "license": "MIT",
   "devDependencies": {
     "concurrently": "^6.2.1",
+    "decktape": "^3.2.0",
     "http-server": "^13.0.2",
     "livereload": "^0.9.3"
   },
