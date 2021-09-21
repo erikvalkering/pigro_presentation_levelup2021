@@ -1,10 +1,10 @@
 name: inverse
 layout: true
-class: middle, inverse
+class: inverse
 
 ---
 
-class: center
+class: center, middle
 
 # PIGRO
 
