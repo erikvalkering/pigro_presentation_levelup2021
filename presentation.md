@@ -14,9 +14,8 @@ class: center, middle, title-page
 ## .footnote[[github.com/erikvalkering/pigro](https://github.com/erikvalkering/pigro)]
 
 ---
-name: caching
 
-# Caching
+# Lazy functions
 
 ```c++
 auto lazy(auto f) {
@@ -87,10 +86,12 @@ count: false
 ### Usage:
 
 ```c++
+auto draw_mouse_cursor(const point_2d pos, const image &icon) -> ui_object;
 auto get_mouse_pos() -> point_2d;
-auto draw_mouse_cursor(const point_2d pos) -> void;
+auto load_image(const std::string_view filename) -> image;
 
-auto mouse_cursor = lazy(draw_mouse_cursor, get_mouse_pos);
+auto arrow = [] { return load_image("arrow.png"); };
+auto mouse_cursor = lazy(draw_mouse_cursor, get_mouse_pos, arrow);
 
 // Rendering loop
 while (true) {
@@ -98,39 +99,17 @@ while (true) {
 }
 ```
 
----
-name: function dependencies usage
-count: false
-
-# Function dependencies
-
-### Usage:
-
-```c++
-auto get_mouse_pos() -> point_2d;
-auto draw_mouse_cursor(const point_2d pos, `const image &icon`) -> void;
-*auto load_image(const std::string_view filename) -> image;
-
-*auto arrow = [] { return load_image("arrow.png"); };
-auto mouse_cursor = lazy(draw_mouse_cursor, get_mouse_pos, `arrow`);
-
-// Rendering loop
-while (true) {
-    mouse_cursor();
-}
-```
-
----
-template: function dependencies usage
-count: false
+--
 
 ### Issues:
-.hide-li[
-- .ri-checkbox-blank-fill[] Verbosity: the need to create a lambda for `arrow`
-- .ri-checkbox-blank-fill[] Performance: the image is loaded repeatedly from disk
-]
+.ri-checkbox-blank-fill[] .failure[Verbosity:] the need to create a lambda for `arrow`
+
+.ri-checkbox-blank-fill[] .failure[Performance:] the `image` is loaded repeatedly from disk
 
 ---
+name: value dependencies
+class: disable-highlighting
+
 # Value dependencies
 
 ```cpp
@@ -140,28 +119,59 @@ auto lazy(auto f, `std::invocable auto... deps`) {
 ```
 
 ```cpp
-auto ensure_invocable(auto dep) {
-    if constexpr (std::invocable<decltype(dep)>)
-        return dep;
-    else
-        return [=] { return dep; };
-}
+*auto ensure_invocable(auto dep) {
+*    if constexpr (std::invocable<decltype(dep)>)
+*        return dep;
+*    else
+*        return [=] { return dep; };
+*}
 ```
 
 ```cpp
-auto lazy(auto f, auto... deps) {
-    return lazy(f, ensure_invocable(deps)...);
+*auto lazy(auto f, auto... deps) {
+*    return lazy(f, ensure_invocable(deps)...);
+*}
+```
+
+---
+template: value dependencies
+class: enable-highlighting
+count: false
+
+> `std::invocable` is a C++20 **_concept_**
+
+---
+count: false
+
+# Value dependencies
+
+### Usage (before):
+```c++
+auto draw_mouse_cursor(const point_2d pos, const image &icon) -> ui_object;
+auto get_mouse_pos() -> point_2d;
+auto load_image(const std::string_view filename) -> image;
+
+auto arrow = [] { return load_image("arrow.png"); };
+auto mouse_cursor = lazy(draw_mouse_cursor, get_mouse_pos, arrow);
+
+// Rendering loop
+while (true) {
+    mouse_cursor();
 }
 ```
 
 ---
+name: value dependencies verbosity
+class: disable-highlighting
+
 # Value dependencies
 
 ### Usage:
 ```c++
+auto draw_mouse_cursor(const point_2d pos, const image &icon) -> ui_object;
 auto get_mouse_pos() -> point_2d;
-auto draw_mouse_cursor(const point_2d pos, const image &icon) -> void;
 auto load_image(const std::string_view filename) -> image;
+
 
 auto mouse_cursor = lazy(draw_mouse_cursor, get_mouse_pos, `load_image("arrow.png")`);
 
@@ -170,7 +180,14 @@ while (true) {
     mouse_cursor();
 }
 ```
+
+---
+template: value dependencies verbosity
+class: enable-highlighting
+count: false
+
 --
+
 ### Issues:
 
 .ri-task-fill[] .success[Verbosity:] _**values**_ are now directly supported
@@ -180,15 +197,18 @@ while (true) {
 .ri-checkbox-blank-fill[] .failure[Performance:] the `image` is loaded repeatedly from disk
 
 ---
+name: value dependencies performance
+class: disable-highlighting
 count: false
 
 # Value dependencies
 
 ### Usage:
 ```c++
+auto draw_mouse_cursor(const point_2d pos, const image &icon) -> ui_object;
 auto get_mouse_pos() -> point_2d;
-auto draw_mouse_cursor(const point_2d pos, const image &icon) -> void;
 auto load_image(const std::string_view filename) -> image;
+
 
 auto mouse_cursor = lazy(draw_mouse_cursor, get_mouse_pos, `lazy(load_image, "arrow.png")`);
 
@@ -201,29 +221,34 @@ while (true) {
 .ri-task-fill[] .success[Verbosity:] _**values**_ are now directly supported
 
 .ri-task-fill[] .success[Performance:] `load_image()` is now called lazily
-]
 
 ---
-
+template: value dependencies performance
+class: enable-highlighting
 count: false
 
-# Value dependencies
+---
+name: value dependencies bonus
+class: disable-highlighting
+count: false
+
+# Value dependencies (Bonus)
 
 ### Usage:
 ```c++
+auto draw_mouse_cursor(const point_2d pos, const image &icon) -> ui_object;
 auto get_mouse_pos() -> point_2d;
-auto draw_mouse_cursor(const point_2d pos, const image &icon) -> void;
 auto load_image(const std::string_view filename) -> image;
 *auto get_drawing_mode() -> drawing_mode;
 
 *auto get_mouse_icon(const drawing_mode mode) {
-*    if (mode == drawing_mode::drawing)
-*        return load_image("crosshair.png");
-*    else
-*        return load_image("arrow.png");
+*    return mode == drawing_mode::drawing
+*         ? load_image("crosshair.png")
+*         : load_image("arrow.png");
 *}
 
-*auto icon = lazy(get_mouse_icon, get_drawing_mode);
+*auto mode = lazy(get_drawing_mode);
+*auto icon = lazy(get_mouse_icon, mode);
 auto mouse_cursor = lazy(draw_mouse_cursor, get_mouse_pos, `icon`);
 
 // Rendering loop
@@ -231,9 +256,13 @@ while (true) {
     mouse_cursor();
 }
 ```
+
+---
+template: value dependencies bonus
+class: enable-highlighting
+count: false
+
 --
 
 ### New issues:
 .ri-checkbox-blank-fill[] .failure[Performance:] the `image` is constantly being compared, even if the drawing mode never changes
-- .ri-checkbox-blank-fill[] Performance: the image is constantly being compared, even if it didn't change
-]

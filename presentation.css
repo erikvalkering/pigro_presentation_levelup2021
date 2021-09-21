@@ -162,6 +162,8 @@ code {
   color: rgb(96, 118, 160);
 }
 
-.hide-li li {
-  list-style-type: none;
+blockquote {
+  margin: 0;
+  padding-left: 1.4rem;
+  border-left: 4px solid #dadada;
 }
