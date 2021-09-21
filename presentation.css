@@ -50,6 +50,9 @@ code {
 .remark-code-line-highlighted {
   background-color: #373832;
 }
+.remark-code-span-highlighted {
+  background-color: #373832;
+}
 .pull-left {
   float: left;
   width: 47%;
