@@ -173,9 +173,11 @@ while (true) {
 --
 ### Issues:
 
-.hide-li[
-- .ri-task-fill[] Verbosity: now pass values directly to `lazy()`
-]
+.ri-task-fill[] .success[Verbosity:] _**values**_ are now directly supported
+
+--
+
+.ri-checkbox-blank-fill[] .failure[Performance:] the `image` is loaded repeatedly from disk
 
 ---
 count: false
@@ -196,9 +198,9 @@ while (true) {
 }
 ```
 ### Issues:
-.hide-li[
-- .ri-task-fill[] Verbosity: now pass values directly to `lazy()`
-- .ri-task-fill[] Performance: `load_image()` is now called lazily
+.ri-task-fill[] .success[Verbosity:] _**values**_ are now directly supported
+
+.ri-task-fill[] .success[Performance:] `load_image()` is now called lazily
 ]
 
 ---
@@ -232,6 +234,6 @@ while (true) {
 --
 
 ### New issues:
-.hide-li[
+.ri-checkbox-blank-fill[] .failure[Performance:] the `image` is constantly being compared, even if the drawing mode never changes
 - .ri-checkbox-blank-fill[] Performance: the image is constantly being compared, even if it didn't change
 ]
