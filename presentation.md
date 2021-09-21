@@ -38,7 +38,7 @@ count: false
 
 ### Usage:
 
-```c++
+```cpp
 auto long_computation() -> int;
 
 auto lazy_computation = lazy(long_computation);
@@ -56,7 +56,7 @@ class: disable-highlighting
 
 # Simple function dependencies
 
-```c++
+```cpp
 auto lazy(auto f, `auto... deps`) {
     using result_t = decltype(f(`deps()...`));
 *   using deps_t = decltype(std::tuple{deps()...});
