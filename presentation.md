@@ -4,7 +4,7 @@ class: inverse
 
 ---
 background-image: url(Flash_Zootopia.png)
-background-size: 90%
+background-size: 70%
 class: center, middle, title-page
 
 # PIGRO
