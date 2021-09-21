@@ -9,7 +9,7 @@ class: center, middle, title-page
 
 # PIGRO
 
-#### Lazy Evaluation on Steroids
+#### LAZY EVALUATION ON STEROIDS
 
 ## .footnote[[github.com/erikvalkering/pigro](https://github.com/erikvalkering/pigro)]
 
