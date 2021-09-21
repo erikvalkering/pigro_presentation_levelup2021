@@ -3,12 +3,12 @@
   "devDependencies": {
     "concurrently": "^6.2.1",
     "http-server": "^13.0.2",
-    "livereload": "^0.4.1"
+    "livereload": "^0.9.3"
   },
   "scripts": {
-    "watch": "livereload .",
-    "start": "http-server",
-    "dev": "concurrently -n watch,web --kill-others \"yarn watch\" \"yarn http-server\""
+    "watch": "livereload . -ee md",
+    "start": "http-server -c-1",
+    "dev": "concurrently -n watch,web --kill-others \"yarn watch\" \"yarn start\""
   },
   "name": "pigro-presentation-levelup2021",
   "version": "1.0.0",
