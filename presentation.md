@@ -32,6 +32,28 @@ auto lazy(auto f) {
 }
 ```
 
+---
+
+count: false
+
+# Simple caching
+
+```c++
+auto lazy(auto f) {
+    using result_t = decltype(f());
+
+    auto cache = std::optional<result_t>{};
+    return [=]() mutable {
+      if (!cache) {
+          const auto result = f(args...);
+          cache = std::move(result);
+      }
+
+      return *cache;
+    };
+}
+```
+
 ### Usage:
 
 ```c++
