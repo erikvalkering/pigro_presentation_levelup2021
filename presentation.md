@@ -16,7 +16,7 @@ class: center, middle, title-page
 ---
 name: caching
 
-# Simple caching
+# Caching
 
 ```c++
 auto lazy(auto f) {
@@ -50,10 +50,10 @@ auto universe_and_everything = lazy_computation(); // instantaneous!
 ```
 
 ---
-name: dependencies
+name: function dependencies
 class: disable-highlighting
 
-# Simple function dependencies
+# Function dependencies
 
 ```cpp
 auto lazy(auto f, `auto... deps`) {
@@ -75,7 +75,7 @@ auto lazy(auto f, `auto... deps`) {
 ```
 
 ---
-template: dependencies
+template: function dependencies
 class: enable-highlighting
 count: false
 
@@ -83,7 +83,7 @@ count: false
 name: dependencies usage
 count: false
 
-# Simple function dependencies
+# Function dependencies
 
 ### Usage:
 
