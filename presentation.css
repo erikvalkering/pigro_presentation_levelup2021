@@ -47,9 +47,11 @@ code {
 .remark-inline-code {
   font-family: 'Ubuntu Mono';
 }
-.remark-code-line-highlighted {
-  background-color: #373832;
+.disable-highlighting:not(.enable-highlighting) .remark-code-line-highlighted,
+.disable-highlighting:not(.enable-highlighting) .remark-code-span-highlighted {
+  background-color: rgb(35, 36, 31);
 }
+.remark-code-line-highlighted,
 .remark-code-span-highlighted {
   background-color: #373832;
 }

@@ -52,6 +52,7 @@ auto universe_and_everything = lazy_computation(); // instantaneous!
 
 ---
 name: dependencies
+class: disable-highlighting
 
 # Simple function dependencies
 
@@ -73,6 +74,11 @@ auto lazy(auto f, `auto... deps`) {
     };
 }
 ```
+
+---
+template: dependencies
+class: enable-highlighting
+count: false
 
 ---
 name: dependencies usage
