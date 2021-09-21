@@ -129,7 +129,109 @@ count: false
 - .ri-checkbox-blank-fill[] Verbosity: the need to create a lambda for `arrow`
 - .ri-checkbox-blank-fill[] Performance: the image is loaded repeatedly from disk
 ]
+
+---
+# Value dependencies
+
+```cpp
+auto lazy(auto f, `std::invocable auto... deps`) {
+    // ...as before...
+}
+```
+
+```cpp
+auto ensure_invocable(auto dep) {
+    if constexpr (std::invocable<decltype(dep)>)
+        return dep;
+    else
+        return [=] { return dep; };
+}
+```
+
+```cpp
+auto lazy(auto f, auto... deps) {
+    return lazy(f, ensure_invocable(deps)...);
+}
+```
+
+---
+# Value dependencies
+
+### Usage:
+```c++
+auto get_mouse_pos() -> point_2d;
+auto draw_mouse_cursor(const point_2d pos, const image &icon) -> void;
+auto load_image(const std::string_view filename) -> image;
+
+auto mouse_cursor = lazy(draw_mouse_cursor, get_mouse_pos, `load_image("arrow.png")`);
+
+// Rendering loop
+while (true) {
+    mouse_cursor();
+}
+```
+--
 ### Issues:
-- Verbose: the need to create a lambda for `arrow`
-- Slow: the image is loaded repeatedly from disk
-- (Slow): the image is constantly being compared, even if it didn't change
+
+.hide-li[
+- .ri-task-fill[] Verbosity: now pass values directly to `lazy()`
+]
+
+---
+count: false
+
+# Value dependencies
+
+### Usage:
+```c++
+auto get_mouse_pos() -> point_2d;
+auto draw_mouse_cursor(const point_2d pos, const image &icon) -> void;
+auto load_image(const std::string_view filename) -> image;
+
+auto mouse_cursor = lazy(draw_mouse_cursor, get_mouse_pos, `lazy(load_image, "arrow.png")`);
+
+// Rendering loop
+while (true) {
+    mouse_cursor();
+}
+```
+### Issues:
+.hide-li[
+- .ri-task-fill[] Verbosity: now pass values directly to `lazy()`
+- .ri-task-fill[] Performance: `load_image()` is now called lazily
+]
+
+---
+
+count: false
+
+# Value dependencies
+
+### Usage:
+```c++
+auto get_mouse_pos() -> point_2d;
+auto draw_mouse_cursor(const point_2d pos, const image &icon) -> void;
+auto load_image(const std::string_view filename) -> image;
+*auto get_drawing_mode() -> drawing_mode;
+
+*auto get_mouse_icon(const drawing_mode mode) {
+*    if (mode == drawing_mode::drawing)
+*        return load_image("crosshair.png");
+*    else
+*        return load_image("arrow.png");
+*}
+
+*auto icon = lazy(get_mouse_icon, get_drawing_mode);
+auto mouse_cursor = lazy(draw_mouse_cursor, get_mouse_pos, `icon`);
+
+// Rendering loop
+while (true) {
+    mouse_cursor();
+}
+```
+--
+
+### New issues:
+.hide-li[
+- .ri-checkbox-blank-fill[] Performance: the image is constantly being compared, even if it didn't change
+]
