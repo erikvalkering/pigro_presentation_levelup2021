@@ -230,7 +230,6 @@ count: false
 ---
 name: value dependencies bonus
 class: disable-highlighting
-count: false
 
 # Value dependencies (Bonus)
 
