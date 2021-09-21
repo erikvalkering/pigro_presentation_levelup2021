@@ -8,7 +8,7 @@
   <body>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
     <script>
-      var slideshow = remark.create({
+      const slideshow = remark.create({
         sourceUrl: 'presentation.md',
         highlightLanguage: 'javascript',
         highlightStyle: 'monokai-sublime',
@@ -16,13 +16,11 @@
         highlightSpans: true,
         navigation: { click: true },
       })
-    </script>
-    <script>
+
       document.write(
-        '<script src="http://' +
-          (location.host || 'localhost').split(':')[0] +
-          ':35729/livereload.js?snipver=1"></' +
-          'script>'
+        `<script src="http://${
+          (location.host || 'localhost').split(':')[0]
+        }:35729/livereload.js?snipver=1"><\/script>`
       )
     </script>
   </body>
