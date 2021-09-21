@@ -108,7 +108,7 @@ auto load_image(const std::string_view filename) -> image;
 auto arrow = [] { return load_image("arrow.png"); };
 auto mouse_cursor = lazy(draw_mouse_cursor, get_mouse_pos, arrow);
 
-// Rendering loop
+// Rendering loop for a graphics editor
 while (true) {
     mouse_cursor();
 }
@@ -170,7 +170,7 @@ auto load_image(const std::string_view filename) -> image;
 auto arrow = [] { return load_image("arrow.png"); };
 auto mouse_cursor = lazy(draw_mouse_cursor, get_mouse_pos, arrow);
 
-// Rendering loop
+// Rendering loop for a graphics editor
 while (true) {
     mouse_cursor();
 }
@@ -191,7 +191,7 @@ auto load_image(const std::string_view filename) -> image;
 
 auto mouse_cursor = lazy(draw_mouse_cursor, get_mouse_pos, `load_image("arrow.png")`);
 
-// Rendering loop
+// Rendering loop for a graphics editor
 while (true) {
     mouse_cursor();
 }
@@ -228,7 +228,7 @@ auto load_image(const std::string_view filename) -> image;
 
 auto mouse_cursor = lazy(draw_mouse_cursor, get_mouse_pos, `lazy(load_image, "arrow.png")`);
 
-// Rendering loop
+// Rendering loop for a graphics editor
 while (true) {
     mouse_cursor();
 }
@@ -266,7 +266,7 @@ auto load_image(const std::string_view filename) -> image;
 *auto icon = lazy(get_mouse_icon, mode);
 auto mouse_cursor = lazy(draw_mouse_cursor, get_mouse_pos, `icon`);
 
-// Rendering loop
+// Rendering loop for a graphics editor
 while (true) {
     mouse_cursor();
 }
