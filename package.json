@@ -1,11 +1,14 @@
 {
   "license": "MIT",
   "devDependencies": {
+    "concurrently": "^6.2.1",
     "http-server": "^13.0.2",
     "livereload": "^0.4.1"
   },
   "scripts": {
-    "watch": "livereload ."
+    "watch": "livereload .",
+    "start": "http-server",
+    "dev": "concurrently -n watch,web --kill-others \"yarn watch\" \"yarn http-server\""
   },
   "name": "pigro-presentation-levelup2021",
   "version": "1.0.0",
