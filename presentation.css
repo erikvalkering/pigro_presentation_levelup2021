@@ -83,6 +83,13 @@ code {
   color: #f3f3f3;
   line-height: 0.8em;
 }
+.inverse h1,
+.inverse h2,
+.inverse h3,
+.inverse h4 {
+  text-shadow: 3px 3px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000,
+    -1px 1px 0 #000, 1px 1px 0 #000;
+}
 
 /* Slide-specific styling */
 #slide-inverse .footnote {
