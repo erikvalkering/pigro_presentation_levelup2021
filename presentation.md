@@ -22,12 +22,11 @@ auto lazy(auto f) {
 
     auto cache = std::optional<result_t>{};
     return [=]() mutable {
-      if (!cache) {
-          const auto result = f(args...);
-          cache = std::move(result);
-      }
+        if (!cache) {
+            cache = f(args...);
+        }
 
-      return *cache;
+        return *cache;
     };
 }
 ```
@@ -44,12 +43,11 @@ auto lazy(auto f) {
 
     auto cache = std::optional<result_t>{};
     return [=]() mutable {
-      if (!cache) {
-          const auto result = f(args...);
-          cache = std::move(result);
-      }
+        if (!cache) {
+            cache = f(args...);
+        }
 
-      return *cache;
+        return *cache;
     };
 }
 ```
