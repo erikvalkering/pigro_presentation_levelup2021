@@ -149,6 +149,11 @@ code {
   background-position: center;
 }
 
+.title-page h4 {
+  font-size: 1.1em;
+  color: rgb(96, 118, 160);
+}
+
 .hide-li li {
   list-style-type: none;
 }
