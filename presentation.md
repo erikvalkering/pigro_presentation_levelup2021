@@ -70,17 +70,17 @@ class: disable-highlighting
 # Making Functions ***Reactive***
 
 ```cpp
-auto lazy(auto f, `auto... deps`) {
-    using result_t = decltype(f(`deps()...`));
-*   using deps_t = decltype(std::tuple{deps()...});
+auto lazy(auto f, `auto... dependencies`) {
+    using result_t = decltype(f(`dependencies()...`));
+*   using dependencies_t = decltype(std::tuple{dependencies()...});
 
     auto cache = std::optional<result_t>{};
-*   auto deps_cache = std::optional<deps_t>{};
+*   auto dependencies_cache = std::optional<dependencies_t>{};
     return [=]() mutable {
-*       const auto args = std::tuple{deps()...};
-        if (!cache || `args != deps_cache`) {
+*       const auto args = std::tuple{dependencies()...};
+        if (!cache || `args != dependencies_cache`) {
 *           cache = std::apply(f, args);
-*           deps_cache = args;
+*           dependencies_cache = args;
         }
 
         return *cache;
@@ -128,23 +128,24 @@ class: disable-highlighting
 # Values as dependencies
 
 ```cpp
-auto lazy(auto f, `std::invocable auto... deps`) {
+auto lazy(auto f, `std::invocable auto... dependencies`) {
     // ...as before...
 }
 ```
 
 ```cpp
-*auto ensure_invocable(auto dep) {
-*    if constexpr (std::invocable<decltype(dep)>)
-*        return dep;
-*    else
-*        return [=] { return dep; };
+*auto ensure_invocable(std::invocable auto dependency) {
+*   return dependency;
+*}
+*
+*auto ensure_invocable(auto dependency) {
+*   return [=] { return dependency; };
 *}
 ```
 
 ```cpp
-*auto lazy(auto f, auto... deps) {
-*    return lazy(f, ensure_invocable(deps)...);
+*auto lazy(auto f, auto... dependencies) {
+*    return lazy(f, ensure_invocable(dependencies)...);
 *}
 ```
 
