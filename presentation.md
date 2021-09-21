@@ -286,3 +286,36 @@ count: false
 class: center, middle, title-page
 # Part 2
 #### Injecting some steroids
+---
+name: comparisons
+class: disable-highlighting
+count: false
+
+# So what exactly is going on?
+
+```cpp
+auto lazy(auto f, std::invocable auto... dependencies) {
+    using result_t = decltype(f(dependencies()...));
+    using dependencies_t = decltype(std::tuple{dependencies()...});
+
+    auto cache = std::optional<result_t>{};
+    auto dependencies_cache = std::optional<dependencies_t>{};
+    return [=]() mutable {
+        const auto args = std::tuple{dependencies()...};
+        if (!cache || `args != dependencies_cache`) {
+            cache = std::apply(f, args);
+            dependencies_cache = args;
+        }
+
+        return *cache;
+    };
+}
+```
+
+---
+template: comparisons
+class: enable-highlighting
+
+--
+
+> All the dependencies are unconditionally compared, even if they did **not** change.
