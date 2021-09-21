@@ -30,7 +30,7 @@ class: center, middle, title-page
 
 ---
 
-# Lazy functions
+# Making Functions ***Lazy***
 
 ```c++
 auto lazy(auto f) {
@@ -67,7 +67,7 @@ auto universe_and_everything = lazy_computation(); // instantaneous!
 name: function dependencies
 class: disable-highlighting
 
-# Function dependencies
+# Making Functions ***Reactive***
 
 ```cpp
 auto lazy(auto f, `auto... deps`) {
@@ -96,7 +96,7 @@ count: false
 ---
 count: false
 
-# Function dependencies
+# Making Functions ***Reactive***
 
 ### Usage:
 
@@ -125,7 +125,7 @@ while (true) {
 name: value dependencies
 class: disable-highlighting
 
-# Value dependencies
+# Values as dependencies
 
 ```cpp
 auto lazy(auto f, `std::invocable auto... deps`) {
@@ -158,7 +158,7 @@ count: false
 ---
 count: false
 
-# Value dependencies
+# Values as dependencies
 
 ### Usage (before):
 ```c++
@@ -179,7 +179,7 @@ while (true) {
 name: value dependencies verbosity
 class: disable-highlighting
 
-# Value dependencies
+# Values as dependencies
 
 ### Usage:
 ```c++
@@ -216,7 +216,7 @@ name: value dependencies performance
 class: disable-highlighting
 count: false
 
-# Value dependencies
+# Values as dependencies
 
 ### Usage:
 ```c++
@@ -246,7 +246,7 @@ count: false
 name: value dependencies bonus
 class: disable-highlighting
 
-# Value dependencies (Bonus)
+# Reactivity all the way down
 
 ### Usage:
 ```c++
