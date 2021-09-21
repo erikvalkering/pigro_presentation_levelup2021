@@ -1,0 +1,13 @@
+{
+  "license": "MIT",
+  "devDependencies": {
+    "livereload": "^0.4.1"
+  },
+  "scripts": {
+    "watch": "livereload ."
+  },
+  "name": "pigro-presentation-levelup2021",
+  "version": "1.0.0",
+  "main": "presentation.html",
+  "author": "Erik Valkering <erikvalkering@gmail.com>"
+}
