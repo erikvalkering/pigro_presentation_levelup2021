@@ -154,7 +154,7 @@ template: value dependencies
 class: enable-highlighting
 count: false
 
-> `std::invocable` is a C++20 **_concept_**
+> `std::invocable` is a C++20 **_concept_** which will match callable functions.
 
 ---
 count: false
