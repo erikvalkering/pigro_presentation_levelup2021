@@ -281,3 +281,8 @@ count: false
 
 ### New issues:
 .ri-checkbox-blank-fill[] .failure[Performance:] the `image` is constantly being compared, even if the drawing mode never changes
+
+---
+class: center, middle, title-page
+# Part 2
+#### Injecting some steroids
