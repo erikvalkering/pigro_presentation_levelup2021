@@ -14,6 +14,12 @@ class: center, middle, title-page
 ## .footnote[[github.com/erikvalkering/pigro](https://github.com/erikvalkering/pigro)]
 
 ---
+class: center, middle, title-page
+
+# Part 1
+#### Starting out lazy
+
+---
 # What is Lazy Evaluation anyway?
 
 > In programming language theory, lazy evaluation, or call-by-need, is an evaluation strategy which .blue[***delays the evaluation of an expression until its value is needed***] (non-strict evaluation) and which also .orange[***avoids repeated evaluations***] (sharing). The sharing can reduce the running time of certain functions by an exponential factor over other non-strict evaluation strategies, such as call-by-name, which repeatedly evaluate the same function, blindly, regardless of whether the function can be memoized.
