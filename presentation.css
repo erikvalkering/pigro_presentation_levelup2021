@@ -31,6 +31,16 @@ li p {
 .red {
   color: #fa0000;
 }
+.green {
+  color: #00fa00;
+}
+.blue {
+  color: #3434c4;
+}
+.orange {
+  color: #c47a34;
+}
+
 .failure {
   color: #830a0a;
   font-weight: bold;
