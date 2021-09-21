@@ -33,9 +33,7 @@ auto lazy(auto f) {
 }
 ```
 
----
-template: caching
-count: false
+--
 
 ### Usage:
 
