@@ -143,3 +143,8 @@ code {
   float: right;
   padding-top: 1em;
 }
+
+.title-page {
+  background-repeat: no-repeat;
+  background-position: center;
+}

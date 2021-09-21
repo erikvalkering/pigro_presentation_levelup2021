@@ -3,8 +3,9 @@ layout: true
 class: inverse
 
 ---
-
-class: center, middle
+background-image: url(Flash_Zootopia.png)
+background-size: 90%
+class: center, middle, title-page
 
 # PIGRO
 
