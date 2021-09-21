@@ -8,7 +8,7 @@ class: center, middle
 
 # PIGRO
 
-Lazy Evaluation on Steroids
+#### Lazy Evaluation on Steroids
 
 ## .footnote[[github.com/erikvalkering/pigro](https://github.com/erikvalkering/pigro)]
 
