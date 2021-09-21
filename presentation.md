@@ -80,7 +80,6 @@ class: enable-highlighting
 count: false
 
 ---
-name: dependencies usage
 count: false
 
 # Function dependencies
@@ -100,9 +99,36 @@ while (true) {
 ```
 
 ---
-template: dependencies usage
+name: function dependencies usage
 count: false
 
+# Function dependencies
+
+### Usage:
+
+```c++
+auto get_mouse_pos() -> point_2d;
+auto draw_mouse_cursor(const point_2d pos, `const image &icon`) -> void;
+*auto load_image(const std::string_view filename) -> image;
+
+*auto arrow = [] { return load_image("arrow.png"); };
+auto mouse_cursor = lazy(draw_mouse_cursor, get_mouse_pos, `arrow`);
+
+// Rendering loop
+while (true) {
+    mouse_cursor();
+}
+```
+
+---
+template: function dependencies usage
+count: false
+
+### Issues:
+.hide-li[
+- .ri-checkbox-blank-fill[] Verbosity: the need to create a lambda for `arrow`
+- .ri-checkbox-blank-fill[] Performance: the image is loaded repeatedly from disk
+]
 ### Issues:
 - Verbose: the need to create a lambda for `arrow`
 - Slow: the image is loaded repeatedly from disk

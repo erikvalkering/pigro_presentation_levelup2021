@@ -148,3 +148,7 @@ code {
   background-repeat: no-repeat;
   background-position: center;
 }
+
+.hide-li li {
+  list-style-type: none;
+}
