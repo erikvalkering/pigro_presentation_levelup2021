@@ -1,6 +1,7 @@
 {
   "license": "MIT",
   "devDependencies": {
+    "http-server": "^13.0.2",
     "livereload": "^0.4.1"
   },
   "scripts": {
