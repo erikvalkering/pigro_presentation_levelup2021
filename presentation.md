@@ -38,9 +38,8 @@ auto lazy(auto f) {
 
     auto cache = std::optional<result_t>{};
     return [=]() mutable {
-        if (!cache) {
+        if (!cache)
             cache = f();
-        }
 
         return *cache;
     };
@@ -411,12 +410,10 @@ auto ensure_lazy_function(auto dependency) {
 ```cpp
 auto facade(lazy_function auto f) {
     return [=]<typename... Args>(Args... args) mutable {
-        if constexpr (std::same_as<std::tuple<Args...>, std::tuple<std::nullptr_t>>) {
+        if constexpr (std::same_as<std::tuple<Args...>, std::tuple<std::nullptr_t>>)
             return f(nullptr);
-        }
-        else if (sizeof...(Args) == 0) {
+        else if (sizeof...(Args) == 0)
             return f(nullptr).value;
-        }
     };
 }
 
@@ -424,6 +421,58 @@ auto lazy(auto f, auto... dependencies) {
     return facade(lazy_core(f, ensure_lazy_function(dependencies)...));
 }
 ```
+
+---
+# Even smarter state propagation
+```cpp
+auto lazy_core(auto f, lazy_function auto... dependencies) {
+    using result_t = decltype(f(dependencies(nullptr).value...));
+
+    auto cache = std::optional<result_t>{};
+    return [=](std::nullptr_t) mutable {
+
+        if (!cache || (dependencies(nullptr).is_changed || ...)) {
+            cache = f(dependencies(nullptr).value...);
+
+
+            return LazyResult{*cache, true};
+        }
+
+        return LazyResult{*cache, false};
+    };
+}
+```
+
+---
+name: less changes
+class: disable-highlighting
+count: false
+
+# Even smarter state propagation
+```cpp
+auto lazy_core(auto f, lazy_function auto... dependencies) {
+    using result_t = decltype(f(dependencies(nullptr).value...));
+
+    auto cache = std::optional<result_t>{};
+    return [=](std::nullptr_t) mutable {
+*       auto changed = !cache || (dependencies(nullptr).is_changed || ...);
+        if (`changed`) {
+*           auto result = f(dependencies(nullptr).value...);
+
+*           changed = result != cache;
+*           cache = result;
+        }
+
+        return LazyResult{*cache, `changed`};
+    };
+}
+```
+
+---
+template: less changes
+class: enable-highlighting
+count: false
+
 ---
 # Overview
 .smaller.left-column[
@@ -445,12 +494,15 @@ auto lazy_core(auto f, lazy_function auto... dependencies) {
 
     auto cache = std::optional<result_t>{};
     return [=](std::nullptr_t) mutable {
-        if (!cache || (dependencies(nullptr).is_changed || ...)) {
-            cache = f(dependencies(nullptr).value...);
-            return LazyResult{*cache, true};
+        auto changed = !cache || (dependencies(nullptr).is_changed || ...);
+        if (changed) {
+            auto result = f(dependencies(nullptr).value...);
+
+            changed = result != cache;
+            cache = result;
         }
 
-        return LazyResult{*cache, false};
+        return LazyResult{*cache, changed};
     };
 }
 
@@ -459,12 +511,10 @@ concept lazy_function_with_facade = lazy_function<F> && std::invocable<F>;
 
 auto facade(lazy_function auto f) {
     return [=]<typename... Args>(Args... args) mutable {
-        if constexpr (std::same_as<std::tuple<Args...>, std::tuple<std::nullptr_t>>) {
+        if constexpr (std::same_as<std::tuple<Args...>, std::tuple<std::nullptr_t>>)
             return f(nullptr);
-        }
-        else if (sizeof...(Args) == 0) {
+        else if (sizeof...(Args) == 0)
             return f(nullptr).value;
-        }
     };
 }
 ```
@@ -577,4 +627,4 @@ while (true) {
 # Conclusion and Further Work
 
 - Under 70 lines of code
-- https://godbolt.org/z/osEWrxrv8
+- https://godbolt.org/z/q8oG5da1W
