@@ -331,23 +331,31 @@ auto `lazy_core`(auto f, `lazy_function auto... dependencies`) {
     auto cache = std::optional<result_t>{};
 
     return [=](`std::nullptr_t`) mutable {
+*       auto changed = !cache || (dependencies(nullptr).is_changed || ...);
+        if (`changed`) {
+*           auto result = f(dependencies(nullptr).value...);
 
-        if (!cache || `(dependencies(nullptr).is_changed || ...)`) {
-            cache = `f(dependencies(nullptr).value...)`;
-            `return LazyResult{*cache, true};`
+*           changed = result != cache;
+*           cache = result;
         }
 
-        return `LazyResult{*cache, false}`;
+        return LazyResult{*cache, `changed`};
     };
 }
 ```
-
-> **Note:** In the `pigro` library, the double call to `dependencies(nullptr)` is optimized to a single call.
 
 ---
 template: lazy result
 class: enable-highlighting
 count: false
+
+--
+> **Note:** In the `pigro` library, the double call to `dependencies(nullptr)` is optimized to a single call.
+
+
+--
+### Issues:
+.ri-task-fill[] .success[Performance:] now skipping the comparisons and instead check whether any of the dependencies has changed
 
 ---
 # Let's fix that (2) - Some Helpers
@@ -421,57 +429,6 @@ auto lazy(auto f, auto... dependencies) {
     return facade(lazy_core(f, ensure_lazy_function(dependencies)...));
 }
 ```
-
----
-# Even smarter state propagation
-```cpp
-auto lazy_core(auto f, lazy_function auto... dependencies) {
-    using result_t = decltype(f(dependencies(nullptr).value...));
-
-    auto cache = std::optional<result_t>{};
-    return [=](std::nullptr_t) mutable {
-
-        if (!cache || (dependencies(nullptr).is_changed || ...)) {
-            cache = f(dependencies(nullptr).value...);
-
-
-            return LazyResult{*cache, true};
-        }
-
-        return LazyResult{*cache, false};
-    };
-}
-```
-
----
-name: less changes
-class: disable-highlighting
-count: false
-
-# Even smarter state propagation
-```cpp
-auto lazy_core(auto f, lazy_function auto... dependencies) {
-    using result_t = decltype(f(dependencies(nullptr).value...));
-
-    auto cache = std::optional<result_t>{};
-    return [=](std::nullptr_t) mutable {
-*       auto changed = !cache || (dependencies(nullptr).is_changed || ...);
-        if (`changed`) {
-*           auto result = f(dependencies(nullptr).value...);
-
-*           changed = result != cache;
-*           cache = result;
-        }
-
-        return LazyResult{*cache, `changed`};
-    };
-}
-```
-
----
-template: less changes
-class: enable-highlighting
-count: false
 
 ---
 # Overview
