@@ -585,16 +585,17 @@ while (true) {
 - Declarative
 - Less error-prone
 - Better maintainable
+- Logic can be factored out easily
 ]
 
 ---
-# Conclusion and Further Work
+# Conclusion
 
-- Under 70 lines of code
 - Simple core algorithm by composing smaller fundamental building blocks
+- Under 70 lines of code
+- https://github.com/erikvalkering/pigro
 
-#### Future Work:
-.ri-task-fill[] Support for lazy void-functions
+---
+class: center, middle, title-page
 
-.ri-checkbox-blank-fill[] Support for argument
-.ri-checkbox-blank-fill[] Optimization of empty objects
+# Thank you!
