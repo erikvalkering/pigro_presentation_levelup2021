@@ -14,6 +14,14 @@ class: center, middle, title-page
 ## .footnote[[github.com/erikvalkering/pigro](https://github.com/erikvalkering/pigro)]
 
 ---
+# About me
+- ### Erik Valkering
+- ### Software Engineer @Mindesk (https://mindeskvr.com)
+- ### https://github.com/erikvalkering
+- ### https://medium.com/@eejv
+- ### https://www.linkedin.com/in/erik-valkering-3729702/
+
+---
 class: center, middle, title-page
 
 # Part 1
@@ -27,6 +35,12 @@ class: center, middle, title-page
 #### ***(Emphasis mine)***
 
 ## .footnote[[https://en.wikipedia.org/wiki/Lazy_evaluation](https://en.wikipedia.org/wiki/Lazy_evaluation)]
+
+---
+# Disclaimer
+
+- Presentation will be code-heavy (C++)
+- Slideware: everything passed by value (i.e. no perfect forwarding)
 
 ---
 
