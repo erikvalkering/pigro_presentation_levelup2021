@@ -256,14 +256,13 @@ auto get_mouse_pos() -> point_2d;
 auto load_image(const std::string_view filename) -> image;
 *auto get_drawing_mode() -> drawing_mode;
 
-*auto get_mouse_icon(const drawing_mode mode) {
-*    return mode == drawing_mode::drawing
-*         ? load_image("crosshair.png")
-*         : load_image("arrow.png");
+*auto get_mouse_icon_filename(const drawing_mode mode) {
+*    return mode == drawing_mode::drawing ? "crosshair.png" : "arrow.png";
 *}
 
 *auto mode = lazy(get_drawing_mode);
-*auto icon = lazy(get_mouse_icon, mode);
+*auto filename = lazy(get_mouse_icon_filename, mode);
+*auto icon = lazy(load_image, filename);
 auto mouse_cursor = lazy(draw_mouse_cursor, get_mouse_pos, `icon`);
 
 // Rendering loop for a graphics editor
@@ -371,7 +370,7 @@ template<typename F>
 concept lazy_function_with_facade = lazy_function<F> && std::invocable<F>;
 
 auto lazy_value(auto value, auto is_changed) {
-    return [=](nullptr_t) {
+    return [=](std::nullptr_t) {
         return LazyResult{value, is_changed};
     };
 }
@@ -412,10 +411,10 @@ auto ensure_lazy_function(auto dependency) {
 ```cpp
 auto facade(lazy_function auto f) {
     return [=]<typename... Args>(Args... args) mutable {
-        if constexpr (std::same_as<std::tuple<Args...>, std::tuple<nullptr_t>>) {
+        if constexpr (std::same_as<std::tuple<Args...>, std::tuple<std::nullptr_t>>) {
             return f(nullptr);
         }
-        else if (sizeof...(Args) == 0)
+        else if (sizeof...(Args) == 0) {
             return f(nullptr).value;
         }
     };
@@ -427,28 +426,54 @@ auto lazy(auto f, auto... dependencies) {
 ```
 ---
 # Overview
-- Under 60 lines of code
-- https://godbolt.org/z/f16Ezr8P4
-
 .smaller.left-column[
 ```cpp
-template<typename T, std::same_as<bool> B>
-struct LazyResult {
-    T value;
-    B is_changed;
-};
-
 template<typename F>
 concept lazy_function = requires(F f) {
     { f(nullptr).value };
     { f(nullptr).is_changed };
 };
 
+template<typename T, std::same_as<bool> B>
+struct LazyResult {
+    T value;
+    B is_changed;
+};
+
+auto lazy_core(auto f, lazy_function auto... dependencies) {
+    using result_t = decltype(f(dependencies(nullptr).value...));
+
+    auto cache = std::optional<result_t>{};
+    return [=](std::nullptr_t) mutable {
+        if (!cache || (dependencies(nullptr).is_changed || ...)) {
+            cache = f(dependencies(nullptr).value...);
+            return LazyResult{*cache, true};
+        }
+
+        return LazyResult{*cache, false};
+    };
+}
+
 template<typename F>
 concept lazy_function_with_facade = lazy_function<F> && std::invocable<F>;
 
+auto facade(lazy_function auto f) {
+    return [=]<typename... Args>(Args... args) mutable {
+        if constexpr (std::same_as<std::tuple<Args...>, std::tuple<std::nullptr_t>>) {
+            return f(nullptr);
+        }
+        else if (sizeof...(Args) == 0) {
+            return f(nullptr).value;
+        }
+    };
+}
+```
+]
+
+.smaller.right-column[
+```cpp
 auto lazy_value(auto value, auto is_changed) {
-    return [=](nullptr_t) {
+    return [=](std::nullptr_t) {
         return LazyResult{value, is_changed};
     };
 }
@@ -471,42 +496,85 @@ auto ensure_lazy_function(std::invocable auto dependency) {
 auto ensure_lazy_function(auto dependency) {
     return lazy_value(dependency, false);
 }
-```
-]
-
-.smaller.right-column[
-```cpp
-auto lazy_core(auto f, lazy_function auto... dependencies) {
-    using result_t = decltype(f(dependencies(nullptr).value...));
-
-    auto cache = std::optional<result_t>{};
-    return [=](std::nullptr_t) mutable {
-        if (!cache || (dependencies(nullptr).is_changed || ...)) {
-            cache = f(dependencies(nullptr).value...);
-            return LazyResult{*cache, true};
-        }
-
-        return LazyResult{*cache, false};
-    };
-}
 
 
 
 
 
-auto facade(lazy_function auto f) {
-    return [=]<typename... Args>(Args... args) mutable {
-        if constexpr (std::same_as<std::tuple<Args...>, std::tuple<nullptr_t>>) {
-            return f(nullptr);
-        }
-        else if (sizeof...(Args) == 0) {
-            return f(nullptr).value;
-        }
-    };
-}
+
+
+
+
+
+
 
 auto lazy(auto f, auto... dependencies) {
     return facade(lazy_core(f, ensure_lazy_function(dependencies)...));
 }
 ```
 ]
+
+
+---
+# Comparison with hand-coded solution
+.smaller.left-column[
+#### HAND-CODED
+```cpp
+auto should_draw_mouse_cursor = false;
+auto cache_pos = std::optional<point_2d>{};
+auto cache_icon = std::optional<image>{};
+auto cache_filename = std::optional<std::string>{};
+auto cache_mode = std::optional<drawing_mode>{};
+
+// Rendering loop for a graphics editor
+while (true) {
+    const auto pos = get_mouse_pos();
+    if (cache_pos != pos) {
+        cache_pos = pos;
+        should_draw_mouse_cursor = true;
+    }
+
+    const auto mode = get_drawing_mode();
+    if (cache_mode != mode) {
+        cache_mode = mode;
+
+        const auto filename = get_mouse_icon_filename(mode);
+        if (cache_filename != filename) {
+            cache_filename = filename;
+
+            const auto icon = load_image(filename);
+            if (cache_icon != icon) {
+                cache_icon = icon;
+
+                should_draw_mouse_cursor = true;
+            }
+        }
+    }
+
+    if (should_draw_mouse_cursor /* && cache_pos && cache_icon */) {
+        draw_mouse_cursor(*cache_pos, *cache_icon);
+    }
+}
+```
+]
+
+.smaller.right-column[
+#### LAZY & REACTIVE
+```cpp
+auto mode = lazy(get_drawing_mode);
+auto filename = lazy(get_mouse_icon_filename, mode);
+auto icon = lazy(load_image, filename);
+auto mouse_cursor = lazy(draw_mouse_cursor, get_mouse_pos, icon);
+
+// Rendering loop for a graphics editor
+while (true) {
+    mouse_cursor();
+}
+```
+]
+
+---
+# Conclusion and Further Work
+
+- Under 70 lines of code
+- https://godbolt.org/z/f16Ezr8P4
