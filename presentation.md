@@ -445,7 +445,7 @@ auto lazy(auto f, auto... dependencies) {
 ```
 
 ---
-# Overview
+# Overview - Under 70 lines of code
 .smaller.left-column[
 ```cpp
 template<typename F>
@@ -595,21 +595,23 @@ while (true) {
 }
 ```
 
-- Much shorter
-- Declarative
-- Less error-prone
-- Better maintainable
-- Logic can be factored out easily
+- #### Much shorter
+- #### Declarative
+- #### Less error-prone
+- #### Better maintainable
+- #### Logic can be factored out easily
 ]
 
 ---
+class: center, middle, title-page
 # Conclusion
 
-- Simple core algorithm by composing smaller fundamental building blocks
-- Under 70 lines of code
-- https://github.com/erikvalkering/pigro
+### .orange[Using lazily evaluated functions in a declarative and reactive way will make your code]
+### .orange[easier to reason about, easier to maintain, and less prone to errors.]
 
 ---
 class: center, middle, title-page
 
 # Thank you!
+
+## https://github.com/erikvalkering/pigro
