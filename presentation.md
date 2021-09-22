@@ -558,17 +558,19 @@ auto ensure_lazy_function(auto dependency) {
 
 
 
+
 auto lazy(auto f, auto... dependencies) {
     return facade(lazy_core(f, ensure_lazy_function(dependencies)...));
 }
 ```
 ]
 
+.footer[https://godbolt.org/z/q8oG5da1W]
 
 ---
 # Comparison with hand-coded solution
 .smaller.left-column[
-#### HAND-CODED
+#### .blue[HAND-CODED]
 ```cpp
 auto should_draw_mouse_cursor = false;
 auto cache_pos = std::optional<point_2d>{};
@@ -609,7 +611,7 @@ while (true) {
 ]
 
 .smaller.right-column[
-#### LAZY & REACTIVE
+#### .orange[LAZY & REACTIVE]
 ```cpp
 auto mode = lazy(get_drawing_mode);
 auto filename = lazy(get_mouse_icon_filename, mode);
@@ -621,10 +623,14 @@ while (true) {
     mouse_cursor();
 }
 ```
+
+- Much shorter
+- Declarative
+- Less error-prone
+- Better maintainable
 ]
 
 ---
 # Conclusion and Further Work
 
 - Under 70 lines of code
-- https://godbolt.org/z/q8oG5da1W
