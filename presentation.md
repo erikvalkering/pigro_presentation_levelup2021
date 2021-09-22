@@ -362,10 +362,13 @@ struct LazyResult {
 };
 
 template<typename F>
-concept lazy_function = std::invocable<F, nullptr_t> && requires(F f) {
+concept lazy_function = requires(F f) {
     { f(nullptr).value };
     { f(nullptr).is_changed };
 };
+
+template<typename F>
+concept lazy_function_with_facade = lazy_function<F> && std::invocable<F>;
 
 auto lazy_value(auto value, auto is_changed) {
     return [=](nullptr_t) {
@@ -385,6 +388,10 @@ auto g = lazy_value(1729, false); // always considered up-to-date
 
 ```cpp
 auto ensure_lazy_function(lazy_function auto dependency) {
+    return dependency;
+}
+
+auto ensure_lazy_function(lazy_function_with_facade auto dependency) {
     return dependency;
 }
 
@@ -432,10 +439,13 @@ struct LazyResult {
 };
 
 template<typename F>
-concept lazy_function = std::invocable<F, nullptr_t> && requires(F f) {
+concept lazy_function = requires(F f) {
     { f(nullptr).value };
     { f(nullptr).is_changed };
 };
+
+template<typename F>
+concept lazy_function_with_facade = lazy_function<F> && std::invocable<F>;
 
 auto lazy_value(auto value, auto is_changed) {
     return [=](nullptr_t) {
@@ -444,6 +454,10 @@ auto lazy_value(auto value, auto is_changed) {
 }
 
 auto ensure_lazy_function(lazy_function auto dependency) {
+    return dependency;
+}
+
+auto ensure_lazy_function(lazy_function_with_facade auto dependency) {
     return dependency;
 }
 
