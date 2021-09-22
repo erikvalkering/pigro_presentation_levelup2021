@@ -518,7 +518,9 @@ auto facade(lazy_function auto f) {
     };
 }
 ```
+.footer[https://godbolt.org/z/q8oG5da1W]
 ]
+
 
 .smaller.right-column[
 ```cpp
@@ -564,8 +566,6 @@ auto lazy(auto f, auto... dependencies) {
 }
 ```
 ]
-
-.footer[https://godbolt.org/z/q8oG5da1W]
 
 ---
 # Comparison with hand-coded solution
@@ -634,3 +634,10 @@ while (true) {
 # Conclusion and Further Work
 
 - Under 70 lines of code
+- Simple core algorithm by composing smaller fundamental building blocks
+
+#### Future Work:
+.ri-task-fill[] Support for lazy void-functions
+
+.ri-checkbox-blank-fill[] Support for argument
+.ri-checkbox-blank-fill[] Optimization of empty objects
