@@ -39,7 +39,7 @@ auto lazy(auto f) {
     auto cache = std::optional<result_t>{};
     return [=]() mutable {
         if (!cache) {
-            cache = f(args...);
+            cache = f();
         }
 
         return *cache;
@@ -56,8 +56,8 @@ auto long_computation() -> int;
 
 auto lazy_computation = lazy(long_computation);
 
-auto answer_to_live = lazy_computation(); // may take a while...
-assert(answer_to_live == 42);
+auto answer_to_life = lazy_computation(); // may take a while...
+assert(answer_to_life == 42);
 
 // ...
 auto universe_and_everything = lazy_computation(); // instantaneous!
@@ -289,7 +289,6 @@ class: center, middle, title-page
 ---
 name: comparisons
 class: disable-highlighting
-count: false
 
 # So what exactly is going on?
 
@@ -315,7 +314,185 @@ auto lazy(auto f, std::invocable auto... dependencies) {
 ---
 template: comparisons
 class: enable-highlighting
+count: false
 
 --
 
 > All the dependencies are unconditionally compared, even if they did **not** change.
+
+---
+name: lazy result
+class: disable-highlighting
+
+# Let's fix that (1) - Core Algorithm
+```cpp
+auto `lazy_core`(auto f, `lazy_function auto... dependencies`) {
+    using result_t = decltype(f(`dependencies(nullptr).value`...));
+
+
+    auto cache = std::optional<result_t>{};
+
+    return [=](`std::nullptr_t`) mutable {
+
+        if (!cache || `(dependencies(nullptr).is_changed || ...)`) {
+            cache = `f(dependencies(nullptr).value...)`;
+            `return LazyResult{*cache, true};`
+        }
+
+        return `LazyResult{*cache, false}`;
+    };
+}
+```
+
+> **Note:** In the `pigro` library, the double call to `dependencies(nullptr)` is optimized to a single call.
+
+---
+template: lazy result
+class: enable-highlighting
+count: false
+
+---
+# Let's fix that (2) - Some Helpers
+
+```cpp
+template<typename T, std::same_as<bool> B>
+struct LazyResult {
+    T value;
+    B is_changed;
+};
+
+template<typename F>
+concept lazy_function = std::invocable<F, nullptr_t> && requires(F f) {
+    { f(nullptr).value };
+    { f(nullptr).is_changed };
+};
+
+auto lazy_value(auto value, auto is_changed) {
+    return [=](nullptr_t) {
+        return LazyResult{value, is_changed};
+    };
+}
+```
+
+### Usage:
+```cpp
+auto f = lazy_value(42, true);    // always considered to be changed
+auto g = lazy_value(1729, false); // always considered up-to-date
+```
+
+---
+# Let's fix that (3) - Ensuring laziness
+
+```cpp
+auto ensure_lazy_function(lazy_function auto dependency) {
+    return dependency;
+}
+
+auto ensure_lazy_function(std::invocable auto dependency) {
+    return lazy(
+        [=](int) mutable { return dependency(); },
+        lazy_value(0, true)
+    );
+}
+
+auto ensure_lazy_function(auto dependency) {
+    return lazy_value(dependency, false);
+}
+```
+
+---
+# Let's fix that (4) - Wrapping Up
+```cpp
+auto facade(lazy_function auto f) {
+    return [=]<typename... Args>(Args... args) mutable {
+        if constexpr (std::same_as<std::tuple<Args...>, std::tuple<nullptr_t>>) {
+            return f(nullptr);
+        }
+        else if (sizeof...(Args) == 0)
+            return f(nullptr).value;
+        }
+    };
+}
+
+auto lazy(auto f, auto... dependencies) {
+    return facade(lazy_core(f, ensure_lazy_function(dependencies)...));
+}
+```
+---
+# Overview
+- Under 60 lines of code
+- https://godbolt.org/z/f16Ezr8P4
+
+.smaller.left-column[
+```cpp
+template<typename T, std::same_as<bool> B>
+struct LazyResult {
+    T value;
+    B is_changed;
+};
+
+template<typename F>
+concept lazy_function = std::invocable<F, nullptr_t> && requires(F f) {
+    { f(nullptr).value };
+    { f(nullptr).is_changed };
+};
+
+auto lazy_value(auto value, auto is_changed) {
+    return [=](nullptr_t) {
+        return LazyResult{value, is_changed};
+    };
+}
+
+auto ensure_lazy_function(lazy_function auto dependency) {
+    return dependency;
+}
+
+auto ensure_lazy_function(std::invocable auto dependency) {
+    return lazy(
+        [=](int) mutable { return dependency(); },
+        lazy_value(0, true)
+    );
+}
+
+auto ensure_lazy_function(auto dependency) {
+    return lazy_value(dependency, false);
+}
+```
+]
+
+.smaller.right-column[
+```cpp
+auto lazy_core(auto f, lazy_function auto... dependencies) {
+    using result_t = decltype(f(dependencies(nullptr).value...));
+
+    auto cache = std::optional<result_t>{};
+    return [=](std::nullptr_t) mutable {
+        if (!cache || (dependencies(nullptr).is_changed || ...)) {
+            cache = f(dependencies(nullptr).value...);
+            return LazyResult{*cache, true};
+        }
+
+        return LazyResult{*cache, false};
+    };
+}
+
+
+
+
+
+auto facade(lazy_function auto f) {
+    return [=]<typename... Args>(Args... args) mutable {
+        if constexpr (std::same_as<std::tuple<Args...>, std::tuple<nullptr_t>>) {
+            return f(nullptr);
+        }
+        else if (sizeof...(Args) == 0) {
+            return f(nullptr).value;
+        }
+    };
+}
+
+auto lazy(auto f, auto... dependencies) {
+    return facade(lazy_core(f, ensure_lazy_function(dependencies)...));
+}
+```
+]
